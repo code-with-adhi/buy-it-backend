@@ -84,5 +84,15 @@ router.post("/remove", authMiddleware, async (req, res) => {
     res.status(500).json({ message: "Server error.", error: err.message });
   }
 });
-
+router.delete("/", authMiddleware, async (req, res) => {
+  const userId = req.user.id;
+  try {
+    const user = await User.findById(userId);
+    user.cart = []; // Set the cart to an empty array
+    await user.save();
+    res.status(200).json(user.cart);
+  } catch (err) {
+    res.status(500).json({ message: "Server error.", error: err.message });
+  }
+});
 module.exports = router;
