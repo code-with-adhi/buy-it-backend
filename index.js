@@ -10,16 +10,31 @@ const cartRoutes = require("./routes/cart.routes.js");
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+
+const allowedOrigins = [
+  "http://localhost:5173", 
+  process.env.FRONTEND_URL, 
+];
+
 const corsOptions = {
-  origin: process.env.FRONTEND_URL,
+  origin: function (origin, callback) {
+    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
 };
+
 app.use(cors(corsOptions));
 
+
 app.use(express.json());
+
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
-    console.log(" MongoDB connected successfully!");
+    console.log("MongoDB connected successfully!");
   })
   .catch((err) => {
     console.error(" MongoDB connection error:", err);
@@ -34,5 +49,5 @@ app.get("/", (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(` Server is running `);
+  console.log(` Server is running on port ${PORT}`);
 });
